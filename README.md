@@ -1,4 +1,5 @@
 # code-powershell
+```
 function Detect-Encoding {
     param (
         [Parameter(Mandatory=$true)]
@@ -49,8 +50,4 @@ function Detect-Encoding {
 
     Write-Output "Unknown encoding"
 }
-
-# Пример использования
-$string = "48656C6C6F2C20776F726C6421" # HEX-кодированная строка
-Detect-Encoding -inputString $string # Выводит "HEX"
-
+```
